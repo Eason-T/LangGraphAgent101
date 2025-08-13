@@ -1,23 +1,19 @@
-from langgraph.prebuilt import create_react_agent
-from langchain.chat_models import init_chat_model
-
-def get_weather(city: str) -> str:  
-    """Get weather for a given city."""
-    return f"It's always sunny in {city}!"
+from ..agents.react_agent import build_default_react_agent, build_personalized_react_agent
+from ..utils.messages import extract_useful_info
 
 
-model = init_chat_model(
-    "anthropic:claude-3-7-sonnet-latest",
-    temperature=0
-)
+def main() -> None:
+    agent = build_default_react_agent()
+    state = agent.invoke({"messages": [{"role": "user", "content": "what is the weather in sf"}]})
+    print(extract_useful_info(state))
 
-agent = create_react_agent(
-    model=model,
-    tools=[get_weather],
-    prompt="You are a helpful assistant"  
-)
+    agent_p = build_personalized_react_agent()
+    state_p = agent_p.invoke(
+        {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
+        config={"configurable": {"user_name": "John Smith"}},
+    )
+    print(extract_useful_info(state_p))
 
-# Run the agent
-agent.invoke(
-    {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
-)
+
+if __name__ == "__main__":
+    main()
