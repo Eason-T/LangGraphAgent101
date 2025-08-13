@@ -5,9 +5,12 @@ from langchain_core.messages import AnyMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.prebuilt import create_react_agent
 from langgraph.prebuilt.chat_agent_executor import AgentState
+from langgraph.checkpoint.memory import InMemorySaver
 
 from ..models.ollama import create_ollama_chat_model
 from ..tools.weather import get_weather
+
+checkpointer = InMemorySaver()
 
 class WeatherResponse(BaseModel):
     conditions: str
@@ -19,6 +22,7 @@ def build_default_react_agent():
         tools=[get_weather],
         prompt="You are a helpful assistant",
         response_format=WeatherResponse,
+        checkpointer=checkpointer,
     )
 
 
